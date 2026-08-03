@@ -1,9 +1,16 @@
 # images
 
-Clothing and accessory thumbnails for GTA V / FiveM, captured against a
-greenscreen and cut out to transparent WebP.
+Thumbnails for GTA V / FiveM, captured against a greenscreen and cut out to
+transparent WebP.
 
-**4736 images — 64 MB total, ~14 KB each.**
+**5358 images — 75 MB total, ~14 KB each.**
+
+Two trees:
+
+| tree       | what                                                   | count |
+| ---------- | ------------------------------------------------------ | ----- |
+| `clothing` | garments and worn accessories                          | 4736  |
+| `barber`   | hair, eyebrows, facial hair, make-up, eye colours      | 622   |
 
 ---
 
@@ -13,51 +20,69 @@ The repository is served through [jsDelivr](https://www.jsdelivr.com/), a free
 CDN. Nothing to install, nothing to pay, no bandwidth cap.
 
 ```
-https://cdn.jsdelivr.net/gh/Metkan-ms/images@1.0.0/clothing/<gender>/<bucket>/<drawable>.webp
+https://cdn.jsdelivr.net/gh/Metkan-ms/images@1.1.0/<tree>/<gender>/<bucket>/<index>.webp
 ```
 
-| part       | values                                            |
-| ---------- | ------------------------------------------------- |
-| `gender`   | `male` · `female`                                 |
-| `bucket`   | a component id (`11`) or a prop id (`prop_0`)     |
-| `drawable` | the drawable number, `0`-based                    |
+| part     | values                                                     |
+| -------- | ---------------------------------------------------------- |
+| `tree`   | `clothing` · `barber`                                      |
+| `gender` | `male` · `female`                                          |
+| `bucket` | see the tables below — a component, prop or overlay id     |
+| `index`  | the drawable or style number, `0`-based                    |
 
 Examples:
 
 ```
-.../clothing/male/11/17.webp        male jacket, drawable 17
-.../clothing/female/4/8.webp        female trousers, drawable 8
-.../clothing/male/prop_0/3.webp     male hat, prop 0, drawable 3
+.../clothing/male/11/17.webp             male jacket, drawable 17
+.../clothing/female/4/8.webp             female trousers, drawable 8
+.../clothing/male/prop_0/3.webp          male hat, prop 0, drawable 3
+
+.../barber/male/component_2/17.webp      male hairstyle 17
+.../barber/female/overlay_2/4.webp       female eyebrows, style 4
+.../barber/male/eyecolor_0/12.webp       male eye colour 12
 ```
+
+One rule reads both trees: `<gender>/<bucket>/<index>.webp`. Only the set of
+buckets differs.
 
 ### Pin the version
 
-Always request a **tag** (`@1.0.0`), never a branch (`@main`).
+Always request a **tag** (`@1.1.0`), never a branch (`@main`).
 
 A tag is immutable, so jsDelivr caches it forever and a request never has to
 go back to GitHub. A branch is revalidated every 12 hours, which is slower and
 means a push can change what your customers see without warning.
 
+Adding images means a new tag. `@1.0.0` still exists and still holds the
+clothing on its own — an old pin keeps working rather than silently changing.
+
 ---
 
 ## `index.json`
 
-Lists the drawables that actually exist, so the UI never requests a 404.
+Lists what actually exists, so the UI never requests a 404.
 
 ```json
-{ "male": { "11": [0, 1, 2, ...], "prop_0": [0, 1, ...] }, "female": { ... } }
+{
+  "clothing": { "male": { "11": [0, 1, 2, ...] }, "female": { ... } },
+  "barber":   { "male": { "component_2": [0, 1, ...] }, "female": { ... } }
+}
 ```
 
 ```js
 const index = await (await fetch(`${CDN}/index.json`)).json()
-const jackets = index.male['11']        // every male jacket drawable
+const jackets = index.clothing.male['11']       // every male jacket
+const hair = index.barber.female['component_2'] // every female hairstyle
 ```
 
-Fetch it once at startup and keep it. It is 16 KB.
+Fetch it once at startup and keep it. It is 19 KB.
+
+> The tree name became the first level in `1.1.0`. In `1.0.0` the genders were
+> at the top, with clothing only.
 
 ---
 
-## Component and prop ids
+## `clothing` — component and prop ids
 
 These are GTA V's own numbering — the same values you pass to
 `SetPedComponentVariation` and `SetPedPropIndex`.
@@ -86,8 +111,52 @@ These are GTA V's own numbering — the same values you pass to
 | `prop_6` | watches   |
 | `prop_7` | bracelets |
 
-Components `0`, `2` and `10` (head, hair, decals) are not captured — a
-thumbnail of them shows a bare head rather than an item.
+Components `0` and `10` (head, decals) are not captured — a thumbnail of them
+shows a bare head rather than an item. Component `2` is hair, and it lives in
+the `barber` tree rather than here.
+
+---
+
+## `barber` — hair, overlays and eye colours
+
+Three families, told apart by the bucket's prefix.
+
+**`component_2`** — hairstyles. `SetPedComponentVariation(ped, 2, style, …)`
+
+| bucket        | male | female |
+| ------------- | ---- | ------ |
+| `component_2` | 82   | 86     |
+
+**`overlay_<id>`** — head overlays. `SetPedHeadOverlay(ped, id, style, opacity)`
+
+| bucket       | what                | male | female |
+| ------------ | ------------------- | ---- | ------ |
+| `overlay_1`  | facial hair, beards | 29   | —      |
+| `overlay_2`  | eyebrows            | 34   | 34     |
+| `overlay_4`  | make-up             | 95   | 95     |
+| `overlay_5`  | blush               | 33   | 33     |
+| `overlay_8`  | lipstick            | 10   | 10     |
+| `overlay_10` | chest hair          | 17   | —      |
+
+The ids are GTA's own. Overlays `0`, `3`, `6`, `7`, `9` (blemishes, ageing,
+complexion, sun damage, moles) are not captured: they change the skin so
+slightly that a thumbnail of one is indistinguishable from a thumbnail of
+another.
+
+**`eyecolor_0`** — eye colours. `SetPedEyeColor(ped, index)`
+
+| bucket       | male | female |
+| ------------ | ---- | ------ |
+| `eyecolor_0` | 32   | 32     |
+
+The `_0` is there for consistency of shape, not because GTA numbers eye
+colours by category. There is only ever one.
+
+### A note on the male-only buckets
+
+`overlay_1` and `overlay_10` have no female counterpart, and that is not an
+oversight — GTA offers neither beards nor chest hair on the female model.
+Requesting `barber/female/overlay_1/3.webp` returns 404, which is correct.
 
 ---
 
