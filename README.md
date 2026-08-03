@@ -3,14 +3,14 @@
 Thumbnails for GTA V / FiveM, captured against a greenscreen and cut out to
 transparent WebP.
 
-**5358 images — 75 MB total, ~14 KB each.**
+**5542 images — 78 MB total, ~14 KB each.**
 
 Two trees:
 
-| tree       | what                                                   | count |
-| ---------- | ------------------------------------------------------ | ----- |
-| `clothing` | garments and worn accessories                          | 4736  |
-| `barber`   | hair, eyebrows, facial hair, make-up, eye colours      | 622   |
+| tree       | what                                                        | count |
+| ---------- | ----------------------------------------------------------- | ----- |
+| `clothing` | garments and worn accessories                               | 4736  |
+| `barber`   | hair, overlays (face and skin), eye colours                 | 806   |
 
 ---
 
@@ -20,7 +20,7 @@ The repository is served through [jsDelivr](https://www.jsdelivr.com/), a free
 CDN. Nothing to install, nothing to pay, no bandwidth cap.
 
 ```
-https://cdn.jsdelivr.net/gh/Metkan-ms/images@1.1.0/<tree>/<gender>/<bucket>/<index>.webp
+https://cdn.jsdelivr.net/gh/Metkan-ms/images@1.2.0/<tree>/<gender>/<bucket>/<index>.webp
 ```
 
 | part     | values                                                     |
@@ -47,7 +47,7 @@ buckets differs.
 
 ### Pin the version
 
-Always request a **tag** (`@1.1.0`), never a branch (`@main`).
+Always request a **tag** (`@1.2.0`), never a branch (`@main`).
 
 A tag is immutable, so jsDelivr caches it forever and a request never has to
 go back to GitHub. A branch is revalidated every 12 hours, which is slower and
@@ -129,19 +129,37 @@ Three families, told apart by the bucket's prefix.
 
 **`overlay_<id>`** — head overlays. `SetPedHeadOverlay(ped, id, style, opacity)`
 
+The ids are GTA's own. Every one of the thirteen that draws something is here.
+
 | bucket       | what                | male | female |
 | ------------ | ------------------- | ---- | ------ |
+| `overlay_0`  | blemishes, acne     | 24   | 24     |
 | `overlay_1`  | facial hair, beards | 29   | —      |
 | `overlay_2`  | eyebrows            | 34   | 34     |
+| `overlay_3`  | ageing, wrinkles    | 15   | 15     |
 | `overlay_4`  | make-up             | 95   | 95     |
 | `overlay_5`  | blush               | 33   | 33     |
+| `overlay_6`  | complexion          | 12   | 12     |
+| `overlay_7`  | sun damage          | 11   | 11     |
 | `overlay_8`  | lipstick            | 10   | 10     |
+| `overlay_9`  | freckles, moles     | 18   | 18     |
 | `overlay_10` | chest hair          | 17   | —      |
+| `overlay_11` | body blemishes      | 12   | 12     |
 
-The ids are GTA's own. Overlays `0`, `3`, `6`, `7`, `9` (blemishes, ageing,
-complexion, sun damage, moles) are not captured: they change the skin so
-slightly that a thumbnail of one is indistinguishable from a thumbnail of
-another.
+`overlay_10` and `overlay_11` are torso shots; the other eleven are head
+shots.
+
+### How well they read
+
+Worth knowing before wiring one to a small tile. Judged on the images
+themselves, not guessed at:
+
+| bucket                        | at thumbnail size            |
+| ----------------------------- | ---------------------------- |
+| `0` blemishes, `3` ageing     | obvious                      |
+| `6` complexion, `9` freckles  | clear                        |
+| `7` sun damage                | visible, styles look alike   |
+| `11` body blemishes           | weak — a whole torso, and the marks are small in it |
 
 **`eyecolor_0`** — eye colours. `SetPedEyeColor(ped, index)`
 
