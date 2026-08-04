@@ -3,14 +3,15 @@
 Thumbnails for GTA V / FiveM, captured against a greenscreen and cut out to
 transparent WebP.
 
-**5542 images — 78 MB total, ~14 KB each.**
+**5588 images — 79 MB total, ~14 KB each.**
 
-Two trees:
+Three trees:
 
 | tree       | what                                                        | count |
 | ---------- | ----------------------------------------------------------- | ----- |
 | `clothing` | garments and worn accessories                               | 4736  |
 | `barber`   | hair, overlays (face and skin), eye colours                 | 806   |
+| `parents`  | the head-blend parents                                      | 46    |
 
 ---
 
@@ -42,8 +43,28 @@ Examples:
 .../barber/male/eyecolor_0/12.webp       male eye colour 12
 ```
 
-One rule reads both trees: `<gender>/<bucket>/<index>.webp`. Only the set of
-buckets differs.
+One rule reads those two trees: `<gender>/<bucket>/<index>.webp`. Only the set
+of buckets differs.
+
+### `parents` — the exception
+
+```
+.../parents/Hannah.webp                  head-blend parent 21
+.../parents/Benjamin.webp                head-blend parent 0
+```
+
+Flat, and named after the person rather than numbered. A parent is the same
+face whichever ped is being built, so there is no gender to file it under, and
+`SetPedHeadBlendData` takes an index into a list the engine fixes:
+
+| index   | who                                                      |
+| ------- | -------------------------------------------------------- |
+| `0-20`  | the male heads, Benjamin to Anthony                      |
+| `21-41` | the female heads, Hannah to Emma                         |
+| `42-45` | Misty, Niko, John, Claude                                |
+
+The order is not alphabetical and cannot be sorted: it IS the index the game
+expects. See `parents.json` for the list.
 
 ### Pin the version
 
