@@ -3,13 +3,13 @@
 Thumbnails for GTA V / FiveM, captured against a greenscreen and cut out to
 transparent WebP.
 
-**5588 images — 79 MB total, ~14 KB each.**
+**5433 images — 66 MB total, ~12 KB each.**
 
 Three trees:
 
 | tree       | what                                                        | count |
 | ---------- | ----------------------------------------------------------- | ----- |
-| `clothing` | garments and worn accessories                               | 4736  |
+| `clothing` | garments and worn accessories                               | 4581  |
 | `barber`   | hair, overlays (face and skin), eye colours                 | 806   |
 | `parents`  | the head-blend parents                                      | 46    |
 
@@ -21,7 +21,7 @@ The repository is served through [jsDelivr](https://www.jsdelivr.com/), a free
 CDN. Nothing to install, nothing to pay, no bandwidth cap.
 
 ```
-https://cdn.jsdelivr.net/gh/Metkan-ms/images@1.2.0/<tree>/<gender>/<bucket>/<index>.webp
+https://cdn.jsdelivr.net/gh/Metkan-ms/images@1.4.0/<tree>/<gender>/<bucket>/<index>.webp
 ```
 
 | part     | values                                                     |
@@ -68,14 +68,18 @@ expects. See `parents.json` for the list.
 
 ### Pin the version
 
-Always request a **tag** (`@1.2.0`), never a branch (`@main`).
+Always request a **tag** (`@1.4.0`), never a branch (`@main`).
 
 A tag is immutable, so jsDelivr caches it forever and a request never has to
 go back to GitHub. A branch is revalidated every 12 hours, which is slower and
 means a push can change what your customers see without warning.
 
-Adding images means a new tag. `@1.0.0` still exists and still holds the
+Changing images means a new tag. `@1.0.0` still exists and still holds the
 clothing on its own — an old pin keeps working rather than silently changing.
+
+That matters more since `1.4.0`, which **replaced** every clothing image
+rather than adding to them. `@1.3.1` still serves the older framing, so a
+server that preferred it can stay there.
 
 ---
 
@@ -209,12 +213,31 @@ Requesting `barber/female/overlay_1/3.webp` returns 404, which is correct.
 - **One texture per drawable.** The first variant is captured; recolours of
   the same garment are not separate images.
 
-### Four known bad captures
+### The garment alone, since `1.4.0`
 
-`male/4/44`, `male/4/11`, `female/4/46` and `female/prop_7/18` came out as
-small squares. Those drawables render as nothing on the model, so there was
-no subject to photograph. They are left in place so the numbering stays
-contiguous.
+`clothing` was re-shot. The old set framed the **model wearing** the item, so
+a hat came with a head attached and a pair of glasses sat somewhere inside a
+517 px portrait. The new one crops to the garment itself: the same glasses
+are now 60 px tall and fill their tile.
+
+3182 of the 4581 came back with a noticeably tighter frame. Nothing moved
+index, so a drawable number still means the same garment it did before.
+
+### Empty drawables
+
+240 of the 4581 have little or nothing in them — 146 are an empty frame, 94
+are under 40 px on their long edge. These are drawables that render nothing
+visible on the model: an index the game accepts and draws no geometry for.
+
+They are kept so the numbering stays contiguous, and because the index is
+what a UI looks a garment up by.
+
+The previous set appeared to have only four of these, which was an artefact
+of how it was framed rather than a difference in the game: it photographed
+the whole model, so a drawable that drew nothing still produced a picture of
+a bare head. 109 of those "images" were the same bare head saved under
+different names. Cropping to the subject is what makes an empty drawable
+look empty.
 
 ---
 
