@@ -53,7 +53,7 @@ of buckets differs.
 ### `tattoos` — addressed by name
 
 ```
-.../tattoos/male/MP_Biker_Tat_003_M.webp
+.../tattoos/male/MP_MP_Biker_Tat_003_M.webp
 .../tattoos/female/MP_Bea_F_Neck_000.webp
 ```
 
@@ -115,7 +115,7 @@ Lists what actually exists, so the UI never requests a 404.
 {
   "clothing": { "male": { "11": [0, 1, 2, ...] }, "female": { ... } },
   "barber":   { "male": { "component_2": [0, 1, ...] }, "female": { ... } },
-  "tattoos":  { "male": ["MP_Biker_Tat_003_M", ...], "female": [ ... ] }
+  "tattoos":  { "male": ["MP_MP_Biker_Tat_003_M", ...], "female": [ ... ] }
 }
 ```
 
