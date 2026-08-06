@@ -3,14 +3,15 @@
 Thumbnails for GTA V / FiveM, captured against a greenscreen and cut out to
 transparent WebP.
 
-**5433 images — 66 MB total, ~12 KB each.**
+**7026 images — 82 MB total, ~12 KB each.**
 
-Three trees:
+Four trees:
 
 | tree       | what                                                        | count |
 | ---------- | ----------------------------------------------------------- | ----- |
 | `clothing` | garments and worn accessories                               | 4581  |
 | `barber`   | hair, overlays (face and skin), eye colours                 | 806   |
+| `tattoos`  | tattoo patterns, on the body zone they belong to            | 1593  |
 | `parents`  | the head-blend parents                                      | 46    |
 
 ---
@@ -21,7 +22,7 @@ The repository is served through [jsDelivr](https://www.jsdelivr.com/), a free
 CDN. Nothing to install, nothing to pay, no bandwidth cap.
 
 ```
-https://cdn.jsdelivr.net/gh/Metkan-ms/images@1.4.0/<tree>/<gender>/<bucket>/<index>.webp
+https://cdn.jsdelivr.net/gh/Metkan-ms/images@1.5.0/<tree>/<gender>/<bucket>/<index>.webp
 ```
 
 | part     | values                                                     |
@@ -30,6 +31,9 @@ https://cdn.jsdelivr.net/gh/Metkan-ms/images@1.4.0/<tree>/<gender>/<bucket>/<ind
 | `gender` | `male` · `female`                                          |
 | `bucket` | see the tables below — a component, prop or overlay id     |
 | `index`  | the drawable or style number, `0`-based                    |
+
+`tattoos` and `parents` are addressed by name instead; both are described
+below.
 
 Examples:
 
@@ -45,6 +49,26 @@ Examples:
 
 One rule reads those two trees: `<gender>/<bucket>/<index>.webp`. Only the set
 of buckets differs.
+
+### `tattoos` — addressed by name
+
+```
+.../tattoos/male/MP_Biker_Tat_003_M.webp
+.../tattoos/female/MP_Bea_F_Neck_000.webp
+```
+
+`<gender>/<overlay name>.webp`. No bucket, because the name is already the
+address: all 1593 are unique, and none appears under two collections.
+
+**The collection is deliberately not in the path.** It looks like the obvious
+folder and it does not work: catalogue files spell the same collection two
+ways — `mpbeach_overlays` next to `mpBeach_overlays`, 31 strings for 22 real
+collections — and GitHub serves paths case-sensitively. Half the requests
+would 404 on the spelling alone.
+
+Nor is the body zone in the path, though every shot has one. A server owner
+can move a pattern to another zone in their own catalogue; the photograph is
+still of the same tattoo, and an address that encoded the zone would break.
 
 ### `parents` — the exception
 
@@ -68,7 +92,7 @@ expects. See `parents.json` for the list.
 
 ### Pin the version
 
-Always request a **tag** (`@1.4.0`), never a branch (`@main`).
+Always request a **tag** (`@1.5.0`), never a branch (`@main`).
 
 A tag is immutable, so jsDelivr caches it forever and a request never has to
 go back to GitHub. A branch is revalidated every 12 hours, which is slower and
@@ -90,17 +114,25 @@ Lists what actually exists, so the UI never requests a 404.
 ```json
 {
   "clothing": { "male": { "11": [0, 1, 2, ...] }, "female": { ... } },
-  "barber":   { "male": { "component_2": [0, 1, ...] }, "female": { ... } }
+  "barber":   { "male": { "component_2": [0, 1, ...] }, "female": { ... } },
+  "tattoos":  { "male": ["MP_Biker_Tat_003_M", ...], "female": [ ... ] }
 }
 ```
+
+`tattoos` is a flat list of names rather than buckets of numbers, matching
+how that tree is addressed.
 
 ```js
 const index = await (await fetch(`${CDN}/index.json`)).json()
 const jackets = index.clothing.male['11']       // every male jacket
 const hair = index.barber.female['component_2'] // every female hairstyle
+const inked = new Set(index.tattoos.male)       // which patterns have a photo
 ```
 
-Fetch it once at startup and keep it. It is 19 KB.
+Fetch it once at startup and keep it. It is 52 KB.
+
+`parents` is not in it — see `parents.json`, which carries the order the
+engine imposes and would lose its meaning sorted in here.
 
 > The tree name became the first level in `1.1.0`. In `1.0.0` the genders were
 > at the top, with clothing only.
@@ -200,6 +232,34 @@ colours by category. There is only ever one.
 `overlay_1` and `overlay_10` have no female counterpart, and that is not an
 oversight — GTA offers neither beards nor chest hair on the female model.
 Requesting `barber/female/overlay_1/3.webp` returns 404, which is correct.
+
+---
+
+## `tattoos` — what is covered
+
+1593 patterns, 842 male and 751 female. Each is shot on the body zone it
+belongs to, with the clothing that would hide it removed.
+
+| zone             | shots |
+| ---------------- | ----- |
+| torso            | 711   |
+| right arm        | 257   |
+| left arm         | 228   |
+| head and neck    | 154   |
+| left leg         | 134   |
+| right leg        | 109   |
+| hair             | 0     |
+
+Every one of the 1593 has a visible subject — none came out empty, unlike
+parts of the clothing set.
+
+**The hair zone has no photographs.** Those patterns are hairline overlays
+(`FM_M_Hair_003_a` and the like), and the capture pass skipped them. A UI that
+asks for one gets a 404 and should fall back to whatever it draws for a
+missing image.
+
+A pattern is filed under the gender it renders on. Many exist for one gender
+only, which is why the two counts differ.
 
 ---
 
