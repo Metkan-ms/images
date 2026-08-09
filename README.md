@@ -3,15 +3,16 @@
 Thumbnails for GTA V / FiveM, captured against a greenscreen and cut out to
 transparent WebP.
 
-**7026 images — 82 MB total, ~12 KB each.**
+**7756 images — 94 MB total, ~12 KB each.**
 
-Four trees:
+Five trees:
 
 | tree       | what                                                        | count |
 | ---------- | ----------------------------------------------------------- | ----- |
 | `clothing` | garments and worn accessories                               | 4581  |
 | `barber`   | hair, overlays (face and skin), eye colours                 | 806   |
 | `tattoos`  | tattoo patterns, on the body zone they belong to            | 1593  |
+| `vehicles` | every vehicle, three-quarter view, by spawn name            | 730   |
 | `parents`  | the head-blend parents                                      | 46    |
 
 ---
@@ -22,7 +23,7 @@ The repository is served through [jsDelivr](https://www.jsdelivr.com/), a free
 CDN. Nothing to install, nothing to pay, no bandwidth cap.
 
 ```
-https://cdn.jsdelivr.net/gh/Metkan-ms/images@1.5.0/<tree>/<gender>/<bucket>/<index>.webp
+https://cdn.jsdelivr.net/gh/Metkan-ms/images@1.6.0/<tree>/<gender>/<bucket>/<index>.webp
 ```
 
 | part     | values                                                     |
@@ -32,8 +33,8 @@ https://cdn.jsdelivr.net/gh/Metkan-ms/images@1.5.0/<tree>/<gender>/<bucket>/<ind
 | `bucket` | see the tables below — a component, prop or overlay id     |
 | `index`  | the drawable or style number, `0`-based                    |
 
-`tattoos` and `parents` are addressed by name instead; both are described
-below.
+`vehicles`, `tattoos` and `parents` are addressed by name instead; all three
+are described below.
 
 Examples:
 
@@ -69,6 +70,42 @@ would 404 on the spelling alone.
 Nor is the body zone in the path, though every shot has one. A server owner
 can move a pattern to another zone in their own catalogue; the photograph is
 still of the same tattoo, and an address that encoded the zone would break.
+
+### `vehicles` — addressed by spawn name
+
+```
+.../vehicles/adder.webp
+.../vehicles/police.webp
+.../vehicles/bmx.webp
+```
+
+Flat, and **lowercase, always**. The spawn name is the address because it is
+already the key everywhere else: it is what `GetHashKey` is fed, what
+`vehicles.model` holds in ESX, and what an addon declares in its `.meta`.
+
+The capture writes what the `.meta` spells — `BMX.png`, `Vigero3.png`,
+`Dynasty.png`. GitHub serves paths **case-sensitively**, so those are stored
+lowercased and nothing else. Lowercase the model before building the URL and
+it always resolves:
+
+```js
+const src = `${CDN}/vehicles/${model.toLowerCase()}.webp`
+```
+
+No category in the path, for the same reason the tattoo collections are not in
+theirs: a server owner moves a car from `sedans` to `sports` in their own
+catalogue, and the photograph is still of the same car.
+
+**The glass is de-keyed.** The capture removes the background by flooding in
+from the border, so anything the car *encloses* is never reached — 567 of the
+730 came out with a bright green windscreen. Those regions are keyed
+separately and replaced with a dark tint at partial alpha rather than made
+transparent: these land on cards, and a card can be dark or light. Tinted
+glass reads as glass on both; a hole reads as a hole on the light one.
+
+Addon vehicles are not here, and cannot be: the set is what the base game
+ships. Shoot your own with the same greenscreener and drop them in — the
+address is just the spawn name.
 
 ### `parents` — the exception
 
@@ -115,21 +152,27 @@ Lists what actually exists, so the UI never requests a 404.
 {
   "clothing": { "male": { "11": [0, 1, 2, ...] }, "female": { ... } },
   "barber":   { "male": { "component_2": [0, 1, ...] }, "female": { ... } },
-  "tattoos":  { "male": ["MP_MP_Biker_Tat_003_M", ...], "female": [ ... ] }
+  "tattoos":  { "male": ["MP_MP_Biker_Tat_003_M", ...], "female": [ ... ] },
+  "vehicles": ["adder", "airbus", "airtug", ...]
 }
 ```
 
-`tattoos` is a flat list of names rather than buckets of numbers, matching
-how that tree is addressed.
+`tattoos` and `vehicles` are flat lists of names rather than buckets of
+numbers, matching how those trees are addressed. `vehicles` has no gender
+level either, for the obvious reason.
 
 ```js
 const index = await (await fetch(`${CDN}/index.json`)).json()
 const jackets = index.clothing.male['11']       // every male jacket
 const hair = index.barber.female['component_2'] // every female hairstyle
 const inked = new Set(index.tattoos.male)       // which patterns have a photo
+const shot = new Set(index.vehicles)            // which models have a photo
 ```
 
-Fetch it once at startup and keep it. It is 52 KB.
+Fetch it once at startup and keep it. It is 59 KB.
+
+`vehicles` is what makes an addon car easy to handle: it is not in the list, so
+a UI knows to draw its own placeholder rather than fire a request that 404s.
 
 `parents` is not in it — see `parents.json`, which carries the order the
 engine imposes and would lose its meaning sorted in here.
