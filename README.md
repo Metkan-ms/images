@@ -23,7 +23,7 @@ The repository is served through [jsDelivr](https://www.jsdelivr.com/), a free
 CDN. Nothing to install, nothing to pay, no bandwidth cap.
 
 ```
-https://cdn.jsdelivr.net/gh/Metkan-ms/images@1.6.0/<tree>/<gender>/<bucket>/<index>.webp
+https://cdn.jsdelivr.net/gh/Metkan-ms/images@1.7.0/<tree>/<gender>/<bucket>/<index>.webp
 ```
 
 | part     | values                                                     |
@@ -141,6 +141,9 @@ clothing on its own — an old pin keeps working rather than silently changing.
 That matters more since `1.4.0`, which **replaced** every clothing image
 rather than adding to them. `@1.3.1` still serves the older framing, so a
 server that preferred it can stay there.
+
+`1.7.0` does the same to `barber`: 622 of its 806 are a fresh capture.
+`@1.6.0` still serves the previous shoot.
 
 ---
 
@@ -270,6 +273,20 @@ themselves, not guessed at:
 The `_0` is there for consistency of shape, not because GTA numbers eye
 colours by category. There is only ever one.
 
+**Since `1.7.0` these are a macro of the eye**, 320 x 213, and they are the
+one bucket in the repository with an **opaque background** rather than a
+transparent cut-out.
+
+Both follow from the same thing: an eye colour is a few dozen pixels of iris.
+The previous shots framed the whole head, so all 32 came out looking like the
+same bald man, and picking brown from grey meant guessing. Cropping to the
+iris means the surrounding skin is in frame, and skin is the subject's own
+background — there is nothing to key out and no silhouette to cut around.
+
+They still drop into an `object-fit: contain` tile like everything else. They
+simply arrive as a rectangle, so a UI that rounds its tile corners should clip
+this one rather than rely on the artwork's own edge.
+
 ### A note on the male-only buckets
 
 `overlay_1` and `overlay_10` have no female counterpart, and that is not an
@@ -308,7 +325,8 @@ only, which is why the two counts differ.
 
 ## Notes on the images
 
-- **Transparent background.** Put them on whatever colour your UI uses.
+- **Transparent background**, everywhere but `barber/*/eyecolor_0`. Put them
+  on whatever colour your UI uses.
 - **Cropped to the item**, so sizes differ. A watch is small, a coat is tall.
   Fit them in a fixed box with `object-fit: contain`, do not stretch.
 - **Max 320 px wide.** Enough for a shop tile; the lossless PNG masters are
